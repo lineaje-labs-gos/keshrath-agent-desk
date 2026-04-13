@@ -162,13 +162,14 @@ function destroyPlugins(plugins: LoadedPlugin[]): void {
 export function getPluginConfig(plugins: LoadedPlugin[], pluginId: string): { baseUrl: string; wsUrl: string } | null {
   const plugin = plugins.find((p) => p.manifest.id === pluginId);
   if (!plugin) return null;
-  const portMap: Record<string, number> = {
-    'agent-comm': 3421,
-    'agent-tasks': 3422,
-    'agent-knowledge': 3423,
-    'agent-discover': 3424,
+  const portMap: Record<string, { env: string; fallback: number }> = {
+    'agent-comm': { env: 'AGENT_COMM_PORT', fallback: 3421 },
+    'agent-tasks': { env: 'AGENT_TASKS_PORT', fallback: 3422 },
+    'agent-knowledge': { env: 'AGENT_KNOWLEDGE_PORT', fallback: 3423 },
+    'agent-discover': { env: 'AGENT_DISCOVER_PORT', fallback: 3424 },
   };
-  const port = portMap[pluginId];
+  const entry = portMap[pluginId];
+  const port = entry ? parseInt(process.env[entry.env] ?? String(entry.fallback), 10) : undefined;
   return port
     ? {
         baseUrl: `http://localhost:${port}`,
