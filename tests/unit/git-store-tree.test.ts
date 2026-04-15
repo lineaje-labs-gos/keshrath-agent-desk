@@ -2,7 +2,7 @@
 // discovery. Builds a real temp git repo with nested submodules so the test
 // exercises the actual simple-git + fs.promises code paths.
 
-import { describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -211,9 +211,17 @@ describe('discoverRepoTree — caching', () => {
     const repo = join(tmpRoot, 'cached');
     initRepo(repo);
 
-    const first = await discoverRepoTree(repo);
-    const second = await discoverRepoTree(repo);
-    expect(second).toBe(first); // same object — served from cache
+    // Freeze Date.now so the real wall-clock cost of the first call (which can
+    // exceed TREE_TTL_MS=2000ms on slow filesystems / Windows) doesn't expire
+    // the cache before the second call is made.
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(1_000_000);
+    try {
+      const first = await discoverRepoTree(repo);
+      const second = await discoverRepoTree(repo);
+      expect(second).toBe(first); // same object — served from cache
+    } finally {
+      nowSpy.mockRestore();
+    }
   });
 
   it('normalizes the root so different path representations share a cache entry', async () => {

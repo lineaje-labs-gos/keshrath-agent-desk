@@ -2,6 +2,13 @@
 
 All notable changes to Agent Desk are documented in this file.
 
+## [1.7.1] - 2026-04-15
+
+### Fixed
+
+- **Titlebar drag region** — the v1.7 unified input bar's `#unified-input-slot` had `flex: 1` + `-webkit-app-region: no-drag`, which consumed the entire middle of the frameless titlebar and left only the small "Agent Desk" label as a drag handle. Moved `no-drag` from the slot onto the inner `.unified-input-wrap` so the empty padding around the input stays draggable. (`packages/ui/src/renderer/unified-input.js`)
+- **Flaky `discoverRepoTree` cache test** — `tests/unit/git-store-tree.test.ts` did two back-to-back real-I/O calls and asserted the second hit the cache, but on slow Windows filesystems the first call could exceed the 2s `TREE_TTL_MS` and expire the cache. Frozen `Date.now` for the duration of the test so it asserts caching behavior, not wall-clock luck.
+
 ## [1.7.0] - 2026-04-15
 
 Five Warp-inspired primitives land together. Every feature is additive and opt-in: existing workflows are unaffected, and each capability has its own toggle / keybind. Full build green, 464/464 unit tests passing (+24 new).

@@ -66,7 +66,6 @@ function injectStyles() {
   display: flex;
   justify-content: center;
   align-items: center;
-  -webkit-app-region: no-drag;
   padding: 0 16px;
   min-width: 0;
 }
@@ -74,6 +73,7 @@ function injectStyles() {
   display: flex; flex-direction: column; align-items: stretch;
   width: 100%; max-width: 640px;
   position: relative;
+  -webkit-app-region: no-drag;
 }
 .unified-input-row {
   display: flex; align-items: center; gap: 8px;
