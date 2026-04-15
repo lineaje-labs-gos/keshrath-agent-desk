@@ -1,6 +1,6 @@
 {
   "name": "agent-desk",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "Unified control center for AI coding agents \u00e2\u20ac\u201d terminals, dashboards, and orchestration in one app",
   "author": "Mathias Markl <mathias.markl@mukit.at>",
   "license": "MIT",
@@ -27,8 +27,8 @@
     "start": "npm run build && electron .",
     "dev": "npm run build && electron .",
     "watch": "tsc --watch -p packages/desktop",
-    "lint": "eslint packages/*/src",
-    "lint:fix": "eslint packages/*/src --fix",
+    "lint": "eslint packages/core/src packages/desktop/src packages/server/src packages/ui/src",
+    "lint:fix": "eslint packages/core/src packages/desktop/src packages/server/src packages/ui/src --fix",
     "format": "prettier --write \"packages/**/*.{ts,js,css,html}\"",
     "format:check": "prettier --check \"packages/**/*.{ts,js,css,html}\"",
     "prepare": "husky",

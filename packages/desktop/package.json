@@ -1,6 +1,6 @@
 {
   "name": "@agent-desk/desktop",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "Electron shell for agent-desk. Hosts the main process + preload that bridge @agent-desk/core into Electron's IPC.",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@agent-desk/ui",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "Renderer (vanilla JS + xterm.js + dockview-core) for agent-desk. Zero Electron deps; consumed by @agent-desk/desktop, @agent-desk/server, and @agent-desk/pwa.",
   "type": "module",

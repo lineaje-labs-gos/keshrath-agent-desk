@@ -1,6 +1,6 @@
 {
   "name": "@agent-desk/pwa",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "Progressive Web App entry for agent-desk. Read-only mobile monitoring surface served by @agent-desk/server.",
   "type": "module",

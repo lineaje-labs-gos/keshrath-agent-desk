@@ -1,6 +1,6 @@
 {
   "name": "@agent-desk/server",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "HTTP + WebSocket server that hosts agent-desk for browsers and the PWA. Wraps @agent-desk/core with a token-authenticated WS transport.",
   "type": "module",

@@ -112,6 +112,11 @@ const esModuleFiles = [
   'packages/ui/src/renderer/dom-utils.js',
   'packages/ui/src/renderer/diff-viewer.js',
   'packages/ui/src/renderer/git-sidebar.js',
+  'packages/ui/src/renderer/blocks.js',
+  'packages/ui/src/renderer/edit-review.js',
+  'packages/ui/src/renderer/unified-input.js',
+  'packages/ui/src/renderer/workspace-config.js',
+  'packages/ui/src/renderer/tab-modality.js',
   'packages/ui/src/web-entry.js',
 ];
 

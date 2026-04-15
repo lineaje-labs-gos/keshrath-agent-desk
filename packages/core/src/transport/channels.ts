@@ -178,6 +178,115 @@ export interface RenderedDiff {
 }
 
 // ---------------------------------------------------------------------------
+// Blocks (v1.7) — structured terminal-output segments, OSC 133 framed.
+// One block = one command invocation + its output. Streaming output before
+// the first OSC 133;A is attributed to a synthetic pre-block. Endings are
+// OSC 133;D with the exit code.
+// ---------------------------------------------------------------------------
+
+export interface TerminalBlock {
+  id: string;
+  terminalId: string;
+  /** The command line as entered; empty string for streaming pre-blocks. */
+  command: string;
+  cwd: string | null;
+  startedAt: number;
+  endedAt: number | null;
+  exitCode: number | null;
+  /** Raw captured bytes between the start and end markers (post-ANSI). */
+  output: string;
+  byteCount: number;
+  /** Detected agent tool-call markers that fell inside this block's window. */
+  toolCalls: number;
+}
+
+export interface BlockSearchMatch {
+  block: TerminalBlock;
+  matches: number;
+}
+
+// ---------------------------------------------------------------------------
+// Pending edits (v1.7) — diff-first agent review. Driven by agent-parser
+// tool-call events for Edit / Write / MultiEdit.
+// ---------------------------------------------------------------------------
+
+export type PendingEditKind = 'edit' | 'write' | 'create' | 'multi';
+export type PendingEditStatus = 'pending' | 'approved' | 'rejected';
+
+export interface PendingEditComment {
+  id: string;
+  hunkIndex: number | null;
+  body: string;
+  createdAt: number;
+}
+
+export interface PendingEdit {
+  id: string;
+  terminalId: string;
+  agentName: string | null;
+  kind: PendingEditKind;
+  filePath: string;
+  /** null when kind === 'create' or 'write' to a new file. */
+  oldContent: string | null;
+  newContent: string;
+  createdAt: number;
+  decidedAt: number | null;
+  status: PendingEditStatus;
+  comments: PendingEditComment[];
+  /** Free-form reason captured when rejected. */
+  rejectReason: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Providers (v1.7) — unified-input NL routing. Bring-your-own-key, per
+// workspace. The provider does NOT spawn new agents; it answers one-shot
+// completions for the titlebar input bar.
+// ---------------------------------------------------------------------------
+
+export type ProviderKind = 'anthropic' | 'openai' | 'ollama' | 'custom';
+
+export interface ProviderConfig {
+  id: string;
+  kind: ProviderKind;
+  label: string;
+  /** null = provider default (e.g. https://api.anthropic.com). */
+  endpoint: string | null;
+  model: string;
+  /**
+   * Env var name or OS-keychain reference. The literal API key is NEVER
+   * stored in config or transmitted over the channel. Core resolves it at
+   * request time.
+   */
+  apiKeyRef: string | null;
+}
+
+export interface ProviderCompletion {
+  text: string;
+  /** Populated when the provider returned an error (non-2xx, timeout, etc.). */
+  error?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Workspace config files (v1.7) — skills, hooks, mcp, CLAUDE.md panel.
+// ---------------------------------------------------------------------------
+
+export type WorkspaceConfigKind = 'skill' | 'hook' | 'mcp' | 'claude-md';
+
+export interface WorkspaceConfigFile {
+  kind: WorkspaceConfigKind;
+  relativePath: string;
+  absolutePath: string;
+  size: number;
+  mtime: number;
+}
+
+// ---------------------------------------------------------------------------
+// Tab modality state (v1.7) — 5-state machine driving tab-chrome indicators.
+// ---------------------------------------------------------------------------
+
+export type TabState = 'idle' | 'running' | 'awaiting-input' | 'edits-pending' | 'errored';
+
+// ---------------------------------------------------------------------------
 // External editor handoff
 // ---------------------------------------------------------------------------
 
@@ -236,6 +345,7 @@ export interface RequestChannelMap {
   'file:write': { args: [filePath: string, content: string]; result: { ok: boolean; error?: string } };
   'file:stat': { args: [filePath: string]; result: { exists: boolean; size?: number; mtime?: number } };
   'file:dirname': { args: [filePath: string]; result: string };
+  'file:read': { args: [filePath: string]; result: { ok: boolean; content?: string; error?: string } };
 
   // config / keybindings / history
   'config:read': { args: []; result: ConfigData };
@@ -322,6 +432,79 @@ export interface RequestChannelMap {
     args: [editorId: string, filePath: string, line?: number, col?: number];
     result: EditorOpenResult;
   };
+
+  // blocks (v1.7)
+  'blocks:list': {
+    args: [terminalId?: string, limit?: number];
+    result: TerminalBlock[];
+  };
+  'blocks:get': { args: [blockId: string]; result: TerminalBlock | null };
+  'blocks:search': {
+    args: [query: string, opts?: { terminalId?: string; caseSensitive?: boolean; regex?: boolean }];
+    result: BlockSearchMatch[];
+  };
+  'blocks:rerun': {
+    args: [blockId: string, targetTerminalId?: string];
+    result: { ok: boolean; terminalId?: string; error?: string };
+  };
+  'blocks:clear': { args: [terminalId: string]; result: boolean };
+
+  // pending edits (v1.7)
+  'edits:list': {
+    args: [opts?: { terminalId?: string; status?: PendingEditStatus }];
+    result: PendingEdit[];
+  };
+  'edits:get': { args: [editId: string]; result: PendingEdit | null };
+  'edits:approve': {
+    args: [editId: string];
+    result: { ok: boolean; error?: string };
+  };
+  'edits:reject': {
+    args: [editId: string, reason?: string];
+    result: { ok: boolean; error?: string };
+  };
+  'edits:comment': {
+    args: [editId: string, body: string, hunkIndex?: number];
+    result: PendingEditComment | null;
+  };
+  'edits:ingest': {
+    args: [
+      input: {
+        terminalId: string;
+        agentName: string | null;
+        kind: PendingEditKind;
+        filePath: string;
+        oldContent: string | null;
+        newContent: string;
+      },
+    ];
+    result: PendingEdit;
+  };
+
+  // providers (v1.7 — unified input NL routing)
+  'providers:list': { args: []; result: ProviderConfig[] };
+  'providers:get': { args: [id: string]; result: ProviderConfig | null };
+  'providers:save': { args: [cfg: ProviderConfig]; result: boolean };
+  'providers:delete': { args: [id: string]; result: boolean };
+  'providers:complete': {
+    args: [providerId: string, prompt: string, opts?: { maxTokens?: number; system?: string }];
+    result: ProviderCompletion;
+  };
+
+  // workspace config files (v1.7 — skills/rules panel)
+  'workspace:configFiles': { args: [workspaceId: string]; result: WorkspaceConfigFile[] };
+  'workspace:configRead': {
+    args: [workspaceId: string, relativePath: string];
+    result: string;
+  };
+  'workspace:configWrite': {
+    args: [workspaceId: string, relativePath: string, content: string];
+    result: { ok: boolean; error?: string };
+  };
+
+  // tab modality state (v1.7)
+  'tabs:state': { args: [terminalId: string]; result: TabState };
+  'tabs:allStates': { args: []; result: Record<string, TabState> };
 }
 
 export type RequestChannel = keyof RequestChannelMap;
@@ -358,6 +541,12 @@ export interface PushChannelMap {
   'system:stats-update': [stats: unknown];
 
   'git:update': [root: string];
+
+  // v1.7 push events
+  'blocks:new': [block: TerminalBlock];
+  'blocks:update': [blockId: string, patch: Partial<TerminalBlock>];
+  'edits:update': [edit: PendingEdit];
+  'tabs:update': [terminalId: string, state: TabState];
 }
 
 export type PushChannel = keyof PushChannelMap;

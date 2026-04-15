@@ -1,6 +1,6 @@
 {
   "name": "@agent-desk/core",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "Transport-agnostic core for agent-desk (terminals, sessions, config, agent bridges). No Electron, no Express.",
   "type": "module",

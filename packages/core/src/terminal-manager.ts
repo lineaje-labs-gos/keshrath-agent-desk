@@ -38,12 +38,39 @@ export interface ManagedTerminal {
   inputBuffer: string;
 }
 
+export type TerminalDataListener = (terminalId: string, data: string) => void;
+export type TerminalExitListener = (terminalId: string, exitCode: number) => void;
+
 export class TerminalManager {
   private terminals = new Map<string, ManagedTerminal>();
   private historyListeners: Array<(entry: HistoryEntry) => void> = [];
+  private dataListeners: TerminalDataListener[] = [];
+  private exitListeners: TerminalExitListener[] = [];
 
   onHistoryEntry(listener: (entry: HistoryEntry) => void): void {
     this.historyListeners.push(listener);
+  }
+
+  /**
+   * Subscribe to raw pty data. Called on every chunk for every terminal.
+   * Used by the block-store wiring to partition output into blocks via
+   * OSC 133 sequences. Returns an unsubscribe fn.
+   */
+  onData(listener: TerminalDataListener): () => void {
+    this.dataListeners.push(listener);
+    return () => {
+      const i = this.dataListeners.indexOf(listener);
+      if (i >= 0) this.dataListeners.splice(i, 1);
+    };
+  }
+
+  /** Subscribe to pty exit events. Returns an unsubscribe fn. */
+  onExit(listener: TerminalExitListener): () => void {
+    this.exitListeners.push(listener);
+    return () => {
+      const i = this.exitListeners.indexOf(listener);
+      if (i >= 0) this.exitListeners.splice(i, 1);
+    };
   }
 
   spawn(
@@ -132,6 +159,13 @@ export class TerminalManager {
           /* client gone */
         }
       }
+      for (const listener of this.dataListeners) {
+        try {
+          listener(id, data);
+        } catch {
+          /* listener errors must not break the pty loop */
+        }
+      }
     });
 
     ptyProcess.onExit(({ exitCode }) => {
@@ -142,6 +176,13 @@ export class TerminalManager {
           client.sendExit(exitCode);
         } catch {
           /* client gone */
+        }
+      }
+      for (const listener of this.exitListeners) {
+        try {
+          listener(id, exitCode);
+        } catch {
+          /* listener errors must not break the exit path */
         }
       }
     });

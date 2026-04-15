@@ -54,6 +54,27 @@ export type { BuildHandlersDeps } from './handlers-default.js';
 
 export { renderDiff, detectLanguage, initHighlighter } from './diff-renderer.js';
 
+// v1.7 stores
+export { BlockStore, blockStore } from './block-store.js';
+export { wireBlocks } from './wire-blocks.js';
+export type { WireBlocksOptions } from './wire-blocks.js';
+export { wireEdits } from './wire-edits.js';
+export type { WireEditsOptions } from './wire-edits.js';
+export { wireTabs } from './wire-tabs.js';
+export type { WireTabsOptions } from './wire-tabs.js';
+export { PendingEditsStore, pendingEditsStore } from './pending-edits-store.js';
+export type { EditIngest } from './pending-edits-store.js';
+export {
+  listProviders,
+  getProvider,
+  saveProvider,
+  deleteProvider,
+  complete as providerComplete,
+  PROVIDER_KINDS,
+} from './provider-registry.js';
+export { listWorkspaceConfigFiles, readWorkspaceConfig, writeWorkspaceConfig } from './workspace-config-store.js';
+export { TabStateStore, tabStateStore } from './tab-state-store.js';
+
 export {
   discoverPlugins,
   destroyPlugins,
@@ -109,4 +130,16 @@ export type {
   RenderedDiff,
   DetectedEditor,
   EditorOpenResult,
+  TerminalBlock,
+  BlockSearchMatch,
+  PendingEdit,
+  PendingEditComment,
+  PendingEditKind,
+  PendingEditStatus,
+  ProviderKind,
+  ProviderConfig,
+  ProviderCompletion,
+  WorkspaceConfigKind,
+  WorkspaceConfigFile,
+  TabState,
 } from './transport/channels.js';

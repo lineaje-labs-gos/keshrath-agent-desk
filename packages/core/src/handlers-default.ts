@@ -15,7 +15,7 @@ import { readConfig, writeConfig, CONFIG_FILE, type ConfigData } from './config-
 import { readKeybindings, writeKeybindings } from './keybindings-store.js';
 import { HistoryStore } from './history-store.js';
 import { saveSession, loadSession, getSavedBuffer } from './session-store.js';
-import { fileStat, fileDirname, fileWrite } from './file-ops.js';
+import { fileStat, fileDirname, fileWrite, fileRead } from './file-ops.js';
 import { getSystemStats, startMonitoring, stopMonitoring } from './system-monitor.js';
 import { writeCrashLog, CRASH_LOG_DIR } from './crash-reporter.js';
 import { AgentBridges, knowledge as knowledgeBridge } from './agent-bridges.js';
@@ -25,6 +25,11 @@ import { buildWorkspaceHandlers } from './handlers/workspace-handlers.js';
 import { buildGitHandlers } from './handlers/git-handlers.js';
 import { buildDiffHandlers } from './handlers/diff-handlers.js';
 import { buildEditorHandlers } from './handlers/editor-handlers.js';
+import { buildBlocksHandlers } from './handlers/blocks-handlers.js';
+import { buildEditsHandlers } from './handlers/edits-handlers.js';
+import { buildProvidersHandlers } from './handlers/providers-handlers.js';
+import { buildWorkspaceConfigHandlers } from './handlers/workspace-config-handlers.js';
+import { buildTabsHandlers } from './handlers/tabs-handlers.js';
 
 export interface BuildHandlersDeps {
   terminals: TerminalManager;
@@ -73,6 +78,7 @@ export function buildDefaultRequestHandlers(deps: BuildHandlersDeps): RequestHan
       return s ? { exists: true, size: s.size } : { exists: false };
     },
     'file:dirname': (filePath) => fileDirname(filePath),
+    'file:read': (filePath) => fileRead(filePath),
 
     // config / keybindings / history
     'config:read': () => readConfig(),
@@ -256,6 +262,13 @@ export function buildDefaultRequestHandlers(deps: BuildHandlersDeps): RequestHan
     ...buildGitHandlers(),
     ...buildDiffHandlers(),
     ...buildEditorHandlers(),
+
+    // v1.7 additions: blocks, diff-first review, providers, workspace-config, tabs
+    ...buildBlocksHandlers({ terminals }),
+    ...buildEditsHandlers(),
+    ...buildProvidersHandlers(),
+    ...buildWorkspaceConfigHandlers(),
+    ...buildTabsHandlers(),
   };
 }
 

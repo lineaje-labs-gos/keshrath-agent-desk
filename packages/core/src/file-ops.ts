@@ -2,7 +2,7 @@
 // path-approval policy is appropriate (Electron uses a save-dialog approval
 // set; the server target rejects writes outside an allowlist).
 
-import { statSync, writeFileSync } from 'fs';
+import { statSync, writeFileSync, readFileSync } from 'fs';
 import { dirname } from 'path';
 
 export interface FileStat {
@@ -27,4 +27,12 @@ export function fileDirname(filePath: string): string {
 export function fileWrite(filePath: string, content: string): boolean {
   writeFileSync(filePath, content, 'utf-8');
   return true;
+}
+
+export function fileRead(filePath: string): { ok: boolean; content?: string; error?: string } {
+  try {
+    return { ok: true, content: readFileSync(filePath, 'utf-8') };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
 }

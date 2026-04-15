@@ -118,6 +118,7 @@ export const API_SHAPE: ApiShape = {
     write: { kind: 'request', channel: 'file:write' },
     stat: { kind: 'request', channel: 'file:stat' },
     dirname: { kind: 'request', channel: 'file:dirname' },
+    read: { kind: 'request', channel: 'file:read' },
   },
 
   config: {
@@ -229,6 +230,46 @@ export const API_SHAPE: ApiShape = {
   editor: {
     detect: { kind: 'request', channel: 'editor:detect' },
     open: { kind: 'request', channel: 'editor:open' },
+  },
+
+  blocks: {
+    list: { kind: 'request', channel: 'blocks:list' },
+    get: { kind: 'request', channel: 'blocks:get' },
+    search: { kind: 'request', channel: 'blocks:search' },
+    rerun: { kind: 'request', channel: 'blocks:rerun' },
+    clear: { kind: 'request', channel: 'blocks:clear' },
+    onNew: { kind: 'subscribe', channel: 'blocks:new' },
+    onUpdate: { kind: 'subscribe', channel: 'blocks:update' },
+  },
+
+  edits: {
+    list: { kind: 'request', channel: 'edits:list' },
+    get: { kind: 'request', channel: 'edits:get' },
+    approve: { kind: 'request', channel: 'edits:approve' },
+    reject: { kind: 'request', channel: 'edits:reject' },
+    comment: { kind: 'request', channel: 'edits:comment' },
+    ingest: { kind: 'request', channel: 'edits:ingest' },
+    onUpdate: { kind: 'subscribe', channel: 'edits:update' },
+  },
+
+  providers: {
+    list: { kind: 'request', channel: 'providers:list' },
+    get: { kind: 'request', channel: 'providers:get' },
+    save: { kind: 'request', channel: 'providers:save' },
+    delete: { kind: 'request', channel: 'providers:delete' },
+    complete: { kind: 'request', channel: 'providers:complete' },
+  },
+
+  workspaceConfig: {
+    files: { kind: 'request', channel: 'workspace:configFiles' },
+    read: { kind: 'request', channel: 'workspace:configRead' },
+    write: { kind: 'request', channel: 'workspace:configWrite' },
+  },
+
+  tabs: {
+    state: { kind: 'request', channel: 'tabs:state' },
+    allStates: { kind: 'request', channel: 'tabs:allStates' },
+    onUpdate: { kind: 'subscribe', channel: 'tabs:update' },
   },
 };
 

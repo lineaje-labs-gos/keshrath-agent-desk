@@ -84,6 +84,14 @@ Running multiple AI agents means juggling terminals, losing track of which agent
 - **Diff viewer** -- Shiki-highlighted dockview overlay with unified and side-by-side modes, j/k hunk navigation, Esc to close, o to open in external editor
 - **External editor handoff** -- detects VS Code, Cursor, Windsurf, VSCodium on PATH; opens files via `vscode://file/<path>:<line>:<col>` URL scheme with `--goto` CLI fallback; context menu items on terminal tabs, agent cards, git file rows, and inside the diff viewer
 
+### Warp-inspired primitives (v1.7)
+
+- **Blocks** (Ctrl+B) -- terminal output partitioned by OSC 133 into structured command blocks; collapsible cards with exit-code chip, elapsed time, and one-click rerun
+- **Diff-first edit review** (Ctrl+Shift+R) -- Claude Code tool-call edits captured against git HEAD and presented in a review panel with approve / reject (reverts to HEAD) / comment
+- **Unified input bar** (Ctrl+L) -- titlebar input with intent auto-detect: `$ <cmd>` pipes to focused terminal, `/<name>` opens command palette, plain text routes to focused Claude Code agent or configured provider (anthropic / openai / ollama / custom)
+- **Skills &amp; Rules panel** (Ctrl+8) -- browse and edit `.claude/skills`, `.claude/hooks`, `.mcp.json`, `CLAUDE.md` for the active workspace with path-contained saves
+- **Tab modality states** -- colored dot per tab tracking `idle` / `running` / `awaiting-input` / `edits-pending` / `errored`; click to act (open review, focus terminal)
+
 ### Appearance
 
 - **4 built-in themes** -- Default Dark, Default Light, Dracula, Nord; custom themes via the theme manager
@@ -158,6 +166,10 @@ Pre-built binaries for Windows, macOS, and Linux are available on the [GitHub Re
 | Ctrl+5     | Agent Discover view   |
 | Ctrl+6     | Event Stream view     |
 | Ctrl+7     | Settings view         |
+| Ctrl+8     | Skills &amp; Rules view   |
+| Ctrl+B     | Blocks panel          |
+| Ctrl+Shift+R | Pending edits review |
+| Ctrl+L     | Focus unified input   |
 
 ### General
 

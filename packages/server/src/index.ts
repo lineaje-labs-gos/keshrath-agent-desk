@@ -20,6 +20,9 @@ import {
   onStatsUpdate,
   watchConfig,
   discoverPlugins,
+  wireBlocks,
+  wireEdits,
+  wireTabs,
   type LoadedPlugin,
 } from '@agent-desk/core';
 import { TOKEN, checkExpressToken } from './auth.js';
@@ -151,6 +154,18 @@ onStatsUpdate((stats) => emitAny('system:stats-update', stats));
 
 // Git file-watcher pushes — see packages/core/src/handlers/git-handlers.ts.
 setGitEmitter((root: string) => emitAny('git:update', root));
+
+// v1.7 blocks — partition pty output into structured blocks and broadcast
+// blocks:new / blocks:update over the same WS push bus.
+wireBlocks({
+  terminals,
+  emit: (channel, ...args) => emitAny(channel, ...args),
+});
+wireEdits({ emit: (channel, ...args) => emitAny(channel, ...args) });
+wireTabs({
+  terminals,
+  emit: (channel, ...args) => emitAny(channel, ...args),
+});
 
 // ---------------------------------------------------------------------------
 // Bootstrap

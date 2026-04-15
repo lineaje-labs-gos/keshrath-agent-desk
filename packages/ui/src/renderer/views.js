@@ -40,17 +40,19 @@ async function _initPluginView(viewKey, pluginId, container) {
 }
 
 export function switchView(viewName) {
-  const validViews = ['terminals', 'comm', 'tasks', 'knowledge', 'discover', 'events', 'settings'];
+  const validViews = ['terminals', 'comm', 'tasks', 'knowledge', 'discover', 'events', 'config', 'settings'];
   if (!validViews.includes(viewName)) return;
 
   state.activeView = viewName;
 
+  const viewConfigEl = document.getElementById('view-config');
   dom.terminalViews?.classList.remove('active');
   dom.viewComm?.classList.remove('active');
   dom.viewTasks?.classList.remove('active');
   dom.viewKnowledge?.classList.remove('active');
   dom.viewDiscover?.classList.remove('active');
   dom.viewEvents?.classList.remove('active');
+  viewConfigEl?.classList.remove('active');
   dom.settingsView?.classList.remove('active');
   dom.tabBar.style.display = 'none';
 
@@ -88,6 +90,12 @@ export function switchView(viewName) {
       break;
     case 'events':
       dom.viewEvents.classList.add('active');
+      break;
+    case 'config':
+      viewConfigEl?.classList.add('active');
+      if (typeof registry.mountWorkspaceConfig === 'function') {
+        registry.mountWorkspaceConfig(viewConfigEl);
+      }
       break;
     case 'settings':
       dom.settingsView.classList.add('active');
@@ -198,6 +206,7 @@ export function applyTheme(themeId) {
       knowledge: dom.viewKnowledge,
       discover: dom.viewDiscover,
       events: dom.viewEvents,
+      config: document.getElementById('view-config'),
       settings: dom.settingsView,
     };
     const el = viewEls[currentView];

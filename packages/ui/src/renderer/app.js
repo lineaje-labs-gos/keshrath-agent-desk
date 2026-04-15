@@ -24,6 +24,11 @@ import './git-sidebar.js';
 import './onboarding.js';
 import './feature-tips.js';
 import './diff-viewer.js';
+import './blocks.js';
+import './edit-review.js';
+import './unified-input.js';
+import './workspace-config.js';
+import './tab-modality.js';
 
 // -----------------------------------------------------------------------------
 // Global Listeners

@@ -19,6 +19,9 @@ import {
   getSystemStats,
   AgentBridges,
   createRouter,
+  wireBlocks,
+  wireEdits,
+  wireTabs,
   type PushChannel,
 } from '@agent-desk/core';
 import { mountIpcBridge } from './ipc-bridge.js';
@@ -264,6 +267,10 @@ const PUSH_CHANNELS: PushChannel[] = [
   'history:new',
   'system:stats-update',
   'git:update',
+  'blocks:new',
+  'blocks:update',
+  'edits:update',
+  'tabs:update',
 ];
 
 function wireCorePushBus(router: ReturnType<typeof createRouter>): void {
@@ -280,6 +287,15 @@ function wireCorePushBus(router: ReturnType<typeof createRouter>): void {
   // Task #93b — git file watcher fires this whenever .git/HEAD or .git/index
   // change. The UI subscribes to 'git:update' and refreshes its sidebar.
   setGitEmitter((root: string) => router.emit('git:update', root));
+  wireBlocks({
+    terminals: terminalManager,
+    emit: (channel, ...args) => router.emit(channel, ...args),
+  });
+  wireEdits({ emit: (channel, ...args) => router.emit(channel, ...args) });
+  wireTabs({
+    terminals: terminalManager,
+    emit: (channel, ...args) => router.emit(channel, ...args),
+  });
 }
 
 function setupIPC(): void {

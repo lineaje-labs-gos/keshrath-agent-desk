@@ -2,6 +2,55 @@
 
 All notable changes to Agent Desk are documented in this file.
 
+## [1.7.0] - 2026-04-15
+
+Five Warp-inspired primitives land together. Every feature is additive and opt-in: existing workflows are unaffected, and each capability has its own toggle / keybind. Full build green, 464/464 unit tests passing (+24 new).
+
+### Added
+
+- **Blocks** — terminal output is now partitioned into structured command blocks using OSC 133 shell-integration markers (A/B/C/D) with OSC 7 cwd capture. Each block records command text, elapsed time, exit code, and output. A Ctrl+B panel docks to the right with collapsible block cards, one-click rerun, and per-terminal clear. OSC sequences split across pty chunks are correctly reassembled via a per-terminal pending buffer.
+  - New `@agent-desk/core` exports: `BlockStore`, `blockStore`, `wireBlocks`
+  - New channels: `blocks:list` / `get` / `search` / `rerun` / `clear` + push `blocks:new` / `blocks:update`
+  - New `packages/core/src/block-store.ts` with a hand-rolled OSC 133 / OSC 7 state machine
+  - New `packages/core/src/wire-blocks.ts` bridging `TerminalManager` → parser → router
+  - New `packages/ui/src/renderer/blocks.js` — card stack with exit-code chip and rerun action
+  - 14 new block-store unit tests (chunk-boundary splitting, ST/BEL terminators, cwd capture, search)
+- **Diff-first agent review** — pending file edits from Claude Code tool calls are captured, diffed against git HEAD, and surfaced in a Ctrl+Shift+R review panel with approve / reject (reverts the file) / comment. Capture is debounced per-file and pipes through the existing `agent:file-modified` event bus from `agent-parser.js`.
+  - New `@agent-desk/core` exports: `PendingEditsStore`, `pendingEditsStore`, `wireEdits`, `fileRead`
+  - New channels: `edits:list` / `get` / `approve` / `reject` / `comment` / `ingest` + push `edits:update`; `file:read`
+  - New `packages/core/src/pending-edits-store.ts` + `wire-edits.ts`
+  - New `packages/ui/src/renderer/edit-review.js` — list + diff + approve/reject/comment
+  - 6 new pending-edits unit tests
+- **Unified input bar** — titlebar input with intent auto-detect: `$ <cmd>` pipes to the focused terminal, `/<name>` forwards to the command palette, plain text routes to the focused Claude Code tab's stdin (or to the first configured provider if no agent is focused). Per-browser history (50 entries), Ctrl+L to focus, Up/Down to cycle, Esc clears.
+  - New `@agent-desk/core` exports: `listProviders`, `getProvider`, `saveProvider`, `deleteProvider`, `providerComplete`, `PROVIDER_KINDS`
+  - Real HTTP drivers for Anthropic (`/v1/messages`), OpenAI (`/v1/chat/completions`), Ollama (`/api/generate`), and a generic custom POST. 60-second `AbortController` timeout. API keys are resolved from env-var references (`env:VAR` or `$AGENT_DESK_PROVIDER_<ID>`) — literal keys never touch disk or the channel.
+  - New channels: `providers:list` / `get` / `save` / `delete` / `complete`
+  - New `packages/ui/src/renderer/unified-input.js` — intent router with inline response panel
+- **Skills & Rules panel** — Ctrl+8 opens a new view that lists every `.claude/skills`, `.claude/hooks`, `.mcp.json`, and `CLAUDE.md` under the active workspace's rootPath. Edit in a built-in textarea with Ctrl+S save (path-contained — writes outside the workspace root are refused at the store boundary) or hand off to the detected external editor via the existing `editor.open` channel.
+  - New `@agent-desk/core` exports: `listWorkspaceConfigFiles`, `readWorkspaceConfig`, `writeWorkspaceConfig`
+  - New channels: `workspace:configFiles` / `configRead` / `configWrite`
+  - New `packages/core/src/workspace-config-store.ts` with path-containment guards
+  - New `packages/ui/src/renderer/workspace-config.js`
+- **Tab modality states** — each terminal tab now carries one of `idle` / `running` / `awaiting-input` / `edits-pending` / `errored`, shown as a colored dot before the tab label. States are authored server-side from terminal lifecycle + pending-edits signals; `awaiting-input` is overlaid client-side from agent-parser. Clicking the dot while `edits-pending` opens the review panel; clicking while `awaiting-input` focuses the terminal.
+  - New `@agent-desk/core` exports: `TabStateStore`, `tabStateStore`, `wireTabs`
+  - New channels: `tabs:state` / `allStates` + push `tabs:update`
+  - New `packages/core/src/tab-state-store.ts` + `wire-tabs.ts`
+  - New `packages/ui/src/renderer/tab-modality.js`
+  - 4 new tab-state unit tests
+
+### Changed
+
+- `TerminalManager` gained public `onData(listener)` and `onExit(listener)` subscription APIs so core stores can observe raw pty output without touching the hot path.
+- `API_SHAPE` expanded with `blocks`, `edits`, `providers`, `workspaceConfig`, `tabs` buckets and `file.read`. The `window.agentDesk.*` surface picks these up automatically via the existing `buildAgentDeskApi` shim.
+- `views.js` accepts a new `config` view and delegates to `registry.mountWorkspaceConfig`.
+
+### Deferred to v1.7.1
+
+- Block permalinks / share-a-block URL scheme; cross-terminal search UI integration (backend `blocks:search` is live).
+- Per-hunk approve/reject and Shiki syntax highlighting inside the edit-review panel (plain-text diff for now).
+- Provider settings UI; streaming responses for `providers:complete`.
+- Syntax highlighting in the skills/rules editor; push/pull to git or agent-knowledge sync.
+
 ## [1.6.1] - 2026-04-11
 
 ### Fixed

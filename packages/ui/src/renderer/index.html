@@ -52,6 +52,7 @@
           <span class="material-symbols-outlined app-icon">terminal</span>
           Agent Desk
         </div>
+        <div id="unified-input-slot"></div>
         <div class="window-controls">
           <button id="btn-minimize" aria-label="Minimize">
             <span class="material-symbols-outlined">minimize</span>
@@ -87,6 +88,14 @@
             </button>
             <button class="nav-btn" data-view="events" data-tooltip="Events" aria-label="Events">
               <span class="material-symbols-outlined">timeline</span>
+            </button>
+            <button
+              class="nav-btn"
+              data-view="config"
+              data-tooltip="Skills &amp; Rules (Ctrl+8)"
+              aria-label="Skills &amp; Rules"
+            >
+              <span class="material-symbols-outlined">auto_awesome</span>
             </button>
           </div>
           <div class="nav-bottom">
@@ -151,6 +160,8 @@
             <div id="view-discover" class="view"></div>
 
             <div id="view-events" class="view"></div>
+
+            <div id="view-config" class="view"></div>
 
             <div id="settings-panel" class="view"></div>
           </div>
