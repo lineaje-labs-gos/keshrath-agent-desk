@@ -122,10 +122,24 @@
   },
   "overrides": {
     "ws": ">=8.21.3",
-    "sharp": ">=0.35.3"
+    "sharp": ">=0.35.3",
+    "hono": ">=4.13.1",
+    "builder-util-runtime": ">=9.7.0",
+    "ip-address": ">=10.5.0",
+    "fast-uri": ">=3.1.5",
+    "js-yaml": ">=4.3.1",
+    "tar": ">=7.5.22",
+    "protobufjs": ">=7.6.5"
   },
   "resolutions": {
     "ws": ">=8.21.3",
-    "sharp": ">=0.35.3"
+    "sharp": ">=0.35.3",
+    "hono": ">=4.13.1",
+    "builder-util-runtime": ">=9.7.0",
+    "ip-address": ">=10.5.0",
+    "fast-uri": ">=3.1.5",
+    "js-yaml": ">=4.3.1",
+    "tar": ">=7.5.22",
+    "protobufjs": ">=7.6.5"
   }
 }
