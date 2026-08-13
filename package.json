@@ -100,7 +100,7 @@
     "electron-updater": "^6.8.3",
     "morphdom": "^2.7.8",
     "node-pty": "^1.1.0",
-    "ws": "^8.20.0"
+    "ws": ">=8.21.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -119,5 +119,13 @@
     "typescript-eslint": "^8.0.0",
     "vitepress": "^1.6.4",
     "vitest": "^4.1.2"
+  },
+  "overrides": {
+    "ws": ">=8.21.3",
+    "sharp": ">=0.35.3"
+  },
+  "resolutions": {
+    "ws": ">=8.21.3",
+    "sharp": ">=0.35.3"
   }
 }
