@@ -1,13 +1,19 @@
 {
   "name": "agent-desk",
-  "version": "1.0.22",
-  "description": "Unified control center for AI coding agents — terminals, dashboards, and orchestration in one app",
+  "version": "1.0.22-lineaje-01",
+  "description": "Unified control center for AI coding agents \u2014 terminals, dashboards, and orchestration in one app",
   "author": "Mathias Markl <mathias.markl@mukit.at>",
   "license": "MIT",
+  "contributors": [
+    {
+      "name": "Lineaje DepFixer",
+      "email": "221268890+Lineaje-DepFixer@users.noreply.github.com"
+    }
+  ],
   "homepage": "https://github.com/keshrath/agent-desk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/keshrath/agent-desk.git"
+    "url": "https://github.com/lineaje-labs-gos/keshrath-agent-desk"
   },
   "main": "dist/main/index.js",
   "type": "module",
